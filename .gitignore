@@ -1,0 +1,5 @@
+/static_images/
+/checkpoints/
+/.pytest_cache/
+.idea
+/__MACOSX/
