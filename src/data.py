@@ -9,6 +9,10 @@ from .helpers import compute_mean_and_std, get_data_location
 import matplotlib.pyplot as plt
 
 
+# fix collate fn
+# def collate_fn(batch):
+#    batch = list(filter(lambda x: x is not None, batch))
+#    return torch.utils.data.dataloader.default_collate(batch)
 def get_data_loaders(
         batch_size: int = 32, valid_size: float = 0.2, num_workers: int = -1, limit: int = -1
 ):
@@ -46,19 +50,23 @@ def get_data_loaders(
     # appropriate transforms for that step
     data_transforms = {
         "train": transforms.Compose(
-            [transforms.Resize(256),
+            [transforms.Resize((256, 256)),
              transforms.CenterCrop(224),
              transforms.ToTensor(),
              transforms.Normalize((0.5, 0.5, 0.5),
                                   (0.5, 0.5, 0.5))]
         ),
         "valid": transforms.Compose(
-            [transforms.ToTensor(),
+            [transforms.Resize((256, 256)),
+             transforms.CenterCrop(224),
+             transforms.ToTensor(),
              transforms.Normalize((0.5, 0.5, 0.5),
                                   (0.5, 0.5, 0.5))]
         ),
         "test": transforms.Compose(
-            [transforms.ToTensor(),
+            [transforms.Resize((256, 256)),
+             transforms.CenterCrop(224),
+             transforms.ToTensor(),
              transforms.Normalize((0.5, 0.5, 0.5),
                                   (0.5, 0.5, 0.5))]
         ),
@@ -100,12 +108,14 @@ def get_data_loaders(
         batch_size=batch_size,
         sampler=train_sampler,
         num_workers=num_workers,
+        # collate_fn=collate_fn
     )
     data_loaders["valid"] = torch.utils.data.DataLoader(
         valid_data,
         batch_size=batch_size,
         sampler=valid_sampler,
         num_workers=num_workers,
+        # collate_fn=collate_fn
     )
 
     # Now create the test data loader
@@ -127,7 +137,8 @@ def get_data_loaders(
         batch_size=batch_size,
         sampler=test_sampler,
         num_workers=num_workers,
-        shuffle=False
+        shuffle=False,
+        # collate_fn=collate_fn
     )
 
     return data_loaders
